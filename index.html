@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinSight — Investment Intelligence Dashboard</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Topbar ────────────────────────────────────────────────────────────── -->
+  <header id="topbar">
+
+    <div class="logo">FIN<span>SIGHT</span></div>
+    <div class="sep"></div>
+    <div class="status-pill">
+      <div class="dot"></div>
+      <span class="status-text">Connecting …</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Color mode -->
+    <div class="ctrl">
+      <span class="ctrl-label">Color</span>
+      <div class="color-btns">
+        <button class="btn act" data-cm="cluster">Cluster</button>
+        <button class="btn"     data-cm="sector" >Sector</button>
+        <button class="btn"     data-cm="label"  >Signal</button>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- K clusters -->
+    <div class="ctrl">
+      <span class="ctrl-label">K</span>
+      <input type="range" id="k-slider" min="2" max="10" value="6">
+      <span class="k-val" id="k-val">6</span>
+      <button class="btn" id="k-apply">Apply</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Sector filter -->
+    <div class="ctrl">
+      <span class="ctrl-label">Sector</span>
+      <select id="sector-sel">
+        <option value="All">All</option>
+        <option value="Tech">Tech</option>
+        <option value="Finance">Finance</option>
+        <option value="Healthcare">Healthcare</option>
+        <option value="Consumer">Consumer</option>
+        <option value="Energy">Energy</option>
+        <option value="Industrials">Industrials</option>
+      </select>
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Candlestick ticker -->
+    <div class="ctrl">
+      <span class="ctrl-label">Ticker</span>
+      <input type="text" id="ticker-input" value="AAPL" placeholder="AAPL">
+    </div>
+
+    <div class="sep"></div>
+
+    <!-- Metrics strip -->
+    <div class="ctrl" style="gap:12px">
+      <span class="ctrl-label">Universe</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--t0)">
+        <span style="color:var(--t2)">n=</span><span id="m-n">—</span>
+      </span>
+      <span style="font-family:var(--font-mono);font-size:11px">
+        <span style="color:var(--t2)">Ret=</span><span id="m-ret">—</span>
+      </span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--t0)">
+        <span style="color:var(--t2)">Vol=</span><span id="m-vol">—</span>
+      </span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--green)">
+        ▲<span id="m-out">—</span>
+      </span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--red)">
+        ▼<span id="m-und">—</span>
+      </span>
+    </div>
+
+    <!-- Legend -->
+    <div id="legend" class="legend" style="margin-left:6px"></div>
+
+    <div class="topbar-right">
+      <span style="font-size:9px;color:var(--t2)">Esc = clear brush</span>
+      <button class="btn" id="btn-refresh">↺ Refresh</button>
+    </div>
+
+  </header>
+
+  <!-- ── Dashboard grid ────────────────────────────────────────────────────── -->
+  <div id="dash">
+
+    <!-- Row 1, Col 1: Scatter -->
+    <div class="panel" id="p-scatter" style="grid-column:1;grid-row:1">
+      <div class="panel-head">
+        <span class="panel-title">Risk vs Return</span>
+        <span class="panel-sub">brush to select · dot size = |Sharpe|</span>
+      </div>
+      <div class="panel-body">
+        <svg id="svg-scatter"></svg>
+        <div class="loading" id="load-scatter"><div class="spinner"></div>Loading …</div>
+      </div>
+    </div>
+
+    <!-- Row 1, Col 2: MDS -->
+    <div class="panel" id="p-mds" style="grid-column:2;grid-row:1">
+      <div class="panel-head">
+        <span class="panel-title">Asset Map — MDS</span>
+        <span class="panel-sub">feature-space proximity · hulls = clusters</span>
+      </div>
+      <div class="panel-body">
+        <svg id="svg-mds"></svg>
+        <div class="loading" id="load-mds"><div class="spinner"></div>Loading …</div>
+      </div>
+    </div>
+
+    <!-- Row 1, Col 3: Parallel Coords -->
+    <div class="panel" id="p-parallel" style="grid-column:3;grid-row:1">
+      <div class="panel-head">
+        <span class="panel-title">Parallel Coordinates</span>
+        <span class="panel-sub">brush axes to filter · linked to all views</span>
+      </div>
+      <div class="panel-body">
+        <svg id="svg-parallel"></svg>
+        <div class="loading" id="load-parallel"><div class="spinner"></div>Loading …</div>
+      </div>
+    </div>
+
+    <!-- Row 2, Col 1: Candlestick -->
+    <div class="panel" id="p-candle">
+      <div class="panel-head">
+        <span class="panel-title">Price Chart + RSI</span>
+        <span class="panel-sub">type ticker above + Enter</span>
+      </div>
+      <div class="panel-body">
+        <svg id="svg-candle"></svg>
+        <div class="loading" id="load-candle"><div class="spinner"></div>Loading …</div>
+      </div>
+    </div>
+
+    <!-- Row 2, Col 2: Elbow + Feature Importance stacked -->
+    <div id="p-mid">
+
+      <div id="p-elbow">
+        <div class="panel-head">
+          <span class="panel-title">Elbow — K Selection</span>
+          <span class="panel-sub">click dot to apply K</span>
+        </div>
+        <div class="panel-body">
+          <svg id="svg-elbow"></svg>
+          <div class="loading" id="load-elbow"><div class="spinner"></div>Loading …</div>
+        </div>
+      </div>
+
+      <div id="p-feat">
+        <div class="panel-head">
+          <span class="panel-title">Feature Importance</span>
+          <span class="panel-sub">GBT model</span>
+        </div>
+        <div class="panel-body">
+          <svg id="svg-feat"></svg>
+          <div class="loading" id="load-feat"><div class="spinner"></div>Loading …</div>
+        </div>
+      </div>
+
+    </div><!-- #p-mid -->
+
+    <!-- Row 2, Col 3: Correlation Heatmap -->
+    <div class="panel" id="p-heatmap">
+      <div class="panel-head">
+        <span class="panel-title">Return Correlation</span>
+        <span class="panel-sub">daily returns · click pair to brush</span>
+      </div>
+      <div class="panel-body">
+        <svg id="svg-heatmap"></svg>
+        <div class="loading" id="load-heatmap"><div class="spinner"></div>Loading …</div>
+      </div>
+    </div>
+
+  </div><!-- #dash -->
+</div><!-- #app -->
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/charts.js"></script>
+<script>
+// Hide loaders once charts are drawn
+Bus.on("data:ready", ()=>{
+  ["scatter","mds","parallel","feat"].forEach(id=>{
+    const el=document.getElementById("load-"+id);
+    if(el) el.style.display="none";
+  });
+});
+Bus.on("candle:ready",()=>{ const e=document.getElementById("load-candle"); if(e) e.style.display="none"; });
+Bus.on("elbow:ready", ()=>{ const e=document.getElementById("load-elbow");  if(e) e.style.display="none"; });
+Bus.on("corr:ready",  ()=>{ const e=document.getElementById("load-heatmap");if(e) e.style.display="none"; });
+</script>
+</body>
+</html>
