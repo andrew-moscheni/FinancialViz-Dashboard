@@ -1,4 +1,4 @@
-/* FinSight charts.js — all D3 visualisations, single-screen, linked brushing */
+/* FinancialViz charts.js — all D3 visualisations, single-screen, linked brushing */
 "use strict";
 
 // ── Chart registry: each chart re-renders itself on brush/recolor events ──────
