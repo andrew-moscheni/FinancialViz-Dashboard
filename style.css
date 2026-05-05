@@ -1,4 +1,4 @@
-/* FinSight — single-screen no-scroll dashboard
+/* FinancialViz — single-screen no-scroll dashboard
    IBM Plex Mono (numbers) + DM Sans (UI)
    Dark terminal: navy base, electric cyan accent
 */
@@ -139,16 +139,6 @@ input[type=range]::-webkit-slider-thumb {
 .topbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
 
 /* ── Dashboard grid ─────────────────────────────────────────────────────── */
-/*
-  Layout (fills remaining height after topbar, no scrolling):
-  ┌──────────────┬─────────────────┬──────────────┐
-  │  Scatter     │   MDS           │  Parallel    │ ← row 1 (44%)
-  │  risk/return │   asset map     │  coords      │
-  ├──────────────┼────────┬────────┼──────────────┤
-  │  Candlestick │ Elbow  │Feature │  Heatmap     │ ← row 2 (56%)
-  │  + RSI       │        │Impt.   │  correlation │
-  └──────────────┴────────┴────────┴──────────────┘
-*/
 #dash {
   display: grid;
   grid-template-columns: 1.15fr 1fr 1.05fr;
