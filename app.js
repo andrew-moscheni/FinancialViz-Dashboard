@@ -1,4 +1,4 @@
-/* FinSight app.js — state, event bus, linked brushing, API */
+/* FinancialViz app.js — state, event bus, linked brushing, API */
 "use strict";
 
 // ── Palette ───────────────────────────────────────────────────────────────────
