@@ -1,5 +1,5 @@
 """
-FinSight server.py  —  Flask REST API + ETL pipeline + ML model layer
+FinancialViz server.py  —  Flask REST API + ETL pipeline + ML model layer
 Single-screen no-scroll dashboard backend.
 
 Endpoints
